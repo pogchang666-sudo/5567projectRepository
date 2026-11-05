@@ -1,0 +1,26 @@
+test_block_id_is_unique (tests.test_role_a_propose.RoleAProposalTests.test_block_id_is_unique) ... ok
+test_crashed_leader_schedules_timeout_without_proposal (tests.test_role_a_propose.RoleAProposalTests.test_crashed_leader_schedules_timeout_without_proposal) ... ok
+test_crashed_nonleader_is_not_a_recipient (tests.test_role_a_propose.RoleAProposalTests.test_crashed_nonleader_is_not_a_recipient) ... ok
+test_empty_proposal_uses_high_qc_and_preserves_state (tests.test_role_a_propose.RoleAProposalTests.test_empty_proposal_uses_high_qc_and_preserves_state) ... ok
+test_nonempty_pool_delegates_selection_without_consuming_pool (tests.test_role_a_propose.RoleAProposalTests.test_nonempty_pool_delegates_selection_without_consuming_pool) ... ok
+test_proposal_follows_current_leaders_high_qc (tests.test_role_a_propose.RoleAProposalTests.test_proposal_follows_current_leaders_high_qc) ... ok
+test_amount_boundaries_are_accepted (tests.test_role_a_submit.RoleASubmitTests.test_amount_boundaries_are_accepted) ... ok
+test_invalid_accounts_raise_without_any_mutation (tests.test_role_a_submit.RoleASubmitTests.test_invalid_accounts_raise_without_any_mutation) ... ok
+test_invalid_amounts_raise_without_any_mutation (tests.test_role_a_submit.RoleASubmitTests.test_invalid_amounts_raise_without_any_mutation) ... ok
+test_rejected_request_does_not_consume_transaction_id (tests.test_role_a_submit.RoleASubmitTests.test_rejected_request_does_not_consume_transaction_id) ... ok
+test_valid_admission_allocates_sequential_ids_without_execution (tests.test_role_a_submit.RoleASubmitTests.test_valid_admission_allocates_sequential_ids_without_execution) ... ok
+test_can_vote_checks_availability_view_and_previous_vote (tests.test_role_a_voting.RoleAVotingTests.test_can_vote_checks_availability_view_and_previous_vote) ... ok
+test_can_vote_enforces_locked_branch_or_strictly_newer_qc (tests.test_role_a_voting.RoleAVotingTests.test_can_vote_enforces_locked_branch_or_strictly_newer_qc) ... ok
+test_extends_includes_self_and_ancestors (tests.test_role_a_voting.RoleAVotingTests.test_extends_includes_self_and_ancestors) ... ok
+test_extends_rejects_broken_and_cyclic_ancestry_without_mutation (tests.test_role_a_voting.RoleAVotingTests.test_extends_rejects_broken_and_cyclic_ancestry_without_mutation) ... ok
+test_vote_counts_distinct_voters_and_schedules_qc_once (tests.test_role_a_voting.RoleAVotingTests.test_vote_counts_distinct_voters_and_schedules_qc_once) ... ok
+test_vote_rejects_conflicting_second_proposal_in_same_view (tests.test_role_a_voting.RoleAVotingTests.test_vote_rejects_conflicting_second_proposal_in_same_view) ... ok
+test_vote_rejects_malformed_data (tests.test_role_a_voting.RoleAVotingTests.test_vote_rejects_malformed_data) ... ok
+test_vote_rejects_missing_or_invalid_parent_qc (tests.test_role_a_voting.RoleAVotingTests.test_vote_rejects_missing_or_invalid_parent_qc) ... ok
+test_vote_rejects_unavailable_or_nonrecipient_node (tests.test_role_a_voting.RoleAVotingTests.test_vote_rejects_unavailable_or_nonrecipient_node) ... ok
+test_vote_rejects_wrong_leader_and_view_without_side_effects (tests.test_role_a_voting.RoleAVotingTests.test_vote_rejects_wrong_leader_and_view_without_side_effects) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.004s
+
+OK

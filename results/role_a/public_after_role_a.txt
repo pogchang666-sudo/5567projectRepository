@@ -1,0 +1,188 @@
+test_initial_snapshot (tests.test_framework.FrameworkTests.test_initial_snapshot) ... ok
+test_missing_event_can_be_retried (tests.test_framework.FrameworkTests.test_missing_event_can_be_retried) ... ok
+test_reset_framework (tests.test_framework.FrameworkTests.test_reset_framework) ... ok
+test_empty_chain_commits (tests.test_task_a.TaskATests.test_empty_chain_commits) ... ERROR
+test_one_qc_does_not_commit_own_block (tests.test_task_a.TaskATests.test_one_qc_does_not_commit_own_block) ... ERROR
+test_quorum_not_reached (tests.test_task_a.TaskATests.test_quorum_not_reached) ... ERROR
+test_admission_does_not_execute (tests.test_task_b.TaskBTests.test_admission_does_not_execute) ... ok
+test_committed_execution_and_cleanup (tests.test_task_b.TaskBTests.test_committed_execution_and_cleanup) ... ERROR
+test_insufficient_balance_and_same_id_retry (tests.test_task_b.TaskBTests.test_insufficient_balance_and_same_id_retry) ... ERROR
+test_pool_excludes_only_selected_ancestry (tests.test_task_b.TaskBTests.test_pool_excludes_only_selected_ancestry) ... ERROR
+test_uncommitted_payload_not_executed (tests.test_task_b.TaskBTests.test_uncommitted_payload_not_executed) ... ERROR
+test_batching_and_ancestor_deduplication (tests.test_integration.HotStuffTests.test_batching_and_ancestor_deduplication) ... ERROR
+test_insufficient_funds_rejected_at_commit (tests.test_integration.HotStuffTests.test_insufficient_funds_rejected_at_commit) ... ERROR
+test_invalid_transaction_inputs (tests.test_integration.HotStuffTests.test_invalid_transaction_inputs) ... ok
+test_lock_and_one_vote_per_view (tests.test_integration.HotStuffTests.test_lock_and_one_vote_per_view) ... ok
+test_reset_clears_faults_events_and_accounts (tests.test_integration.HotStuffTests.test_reset_clears_faults_events_and_accounts) ... ERROR
+test_three_chain_and_transfer (tests.test_integration.HotStuffTests.test_three_chain_and_transfer) ... ERROR
+
+======================================================================
+ERROR: test_empty_chain_commits (tests.test_task_a.TaskATests.test_empty_chain_commits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_a.py", line 10, in test_empty_chain_commits
+    d.step()
+    ~~~~~~^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 84, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     "next_view": self.next_view, "timeout": self.timeout}[action](data)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 203, in form_qc
+    raise NotImplementedError('TODO A3 construct a certificate from distinct valid matching votes.')
+NotImplementedError: TODO A3 construct a certificate from distinct valid matching votes.
+
+======================================================================
+ERROR: test_one_qc_does_not_commit_own_block (tests.test_task_a.TaskATests.test_one_qc_does_not_commit_own_block)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_a.py", line 21, in test_one_qc_does_not_commit_own_block
+    n.receive_qc(QC('B1',1,(1,2,3)))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\node.py", line 76, in receive_qc
+    raise NotImplementedError('TODO A4 update certificate/lock state and decide committed block IDs.')
+NotImplementedError: TODO A4 update certificate/lock state and decide committed block IDs.
+
+======================================================================
+ERROR: test_quorum_not_reached (tests.test_task_a.TaskATests.test_quorum_not_reached)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_a.py", line 29, in test_quorum_not_reached
+    try:d.form_qc('B1')
+        ~~~~~~~~~^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 203, in form_qc
+    raise NotImplementedError('TODO A3 construct a certificate from distinct valid matching votes.')
+NotImplementedError: TODO A3 construct a certificate from distinct valid matching votes.
+
+======================================================================
+ERROR: test_committed_execution_and_cleanup (tests.test_task_b.TaskBTests.test_committed_execution_and_cleanup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_b.py", line 37, in test_committed_execution_and_cleanup
+    n.execute_committed([b.id]);n.execute_committed([b.id])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\node.py", line 86, in execute_committed
+    raise NotImplementedError("TODO B3 implement execute_committed")
+NotImplementedError: TODO B3 implement execute_committed
+
+======================================================================
+ERROR: test_insufficient_balance_and_same_id_retry (tests.test_task_b.TaskBTests.test_insufficient_balance_and_same_id_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_b.py", line 26, in test_insufficient_balance_and_same_id_retry
+    a=m.apply(tx);b=m.apply(Transaction('T2','Alice','Charlie',80))
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\blockchain.py", line 21, in apply
+    raise NotImplementedError('TODO B3 B4 validate and deterministically execute one committed transaction.')
+NotImplementedError: TODO B3 B4 validate and deterministically execute one committed transaction.
+
+======================================================================
+ERROR: test_pool_excludes_only_selected_ancestry (tests.test_task_b.TaskBTests.test_pool_excludes_only_selected_ancestry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_b.py", line 16, in test_pool_excludes_only_selected_ancestry
+    parent=d.blocks['B0'];first=d.select_transactions(parent)
+                                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 278, in select_transactions
+    raise NotImplementedError("TODO B2 implement select_transactions")
+NotImplementedError: TODO B2 implement select_transactions
+
+======================================================================
+ERROR: test_uncommitted_payload_not_executed (tests.test_task_b.TaskBTests.test_uncommitted_payload_not_executed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_task_b.py", line 46, in test_uncommitted_payload_not_executed
+    try:n.execute_committed(['X'])
+        ~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\node.py", line 86, in execute_committed
+    raise NotImplementedError("TODO B3 implement execute_committed")
+NotImplementedError: TODO B3 implement execute_committed
+
+======================================================================
+ERROR: test_batching_and_ancestor_deduplication (tests.test_integration.HotStuffTests.test_batching_and_ancestor_deduplication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 67, in test_batching_and_ancestor_deduplication
+    self.advance_until(lambda: not self.demo.mempool)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 13, in advance_until
+    self.demo.step()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 84, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     "next_view": self.next_view, "timeout": self.timeout}[action](data)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 113, in propose
+    transactions = self.select_transactions(parent) if self.mempool else []
+                   ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 278, in select_transactions
+    raise NotImplementedError("TODO B2 implement select_transactions")
+NotImplementedError: TODO B2 implement select_transactions
+
+======================================================================
+ERROR: test_insufficient_funds_rejected_at_commit (tests.test_integration.HotStuffTests.test_insufficient_funds_rejected_at_commit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 46, in test_insufficient_funds_rejected_at_commit
+    self.advance_until(lambda: not self.demo.mempool)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 13, in advance_until
+    self.demo.step()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 84, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     "next_view": self.next_view, "timeout": self.timeout}[action](data)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 113, in propose
+    transactions = self.select_transactions(parent) if self.mempool else []
+                   ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 278, in select_transactions
+    raise NotImplementedError("TODO B2 implement select_transactions")
+NotImplementedError: TODO B2 implement select_transactions
+
+======================================================================
+ERROR: test_reset_clears_faults_events_and_accounts (tests.test_integration.HotStuffTests.test_reset_clears_faults_events_and_accounts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 75, in test_reset_clears_faults_events_and_accounts
+    self.demo.step()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 84, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     "next_view": self.next_view, "timeout": self.timeout}[action](data)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 113, in propose
+    transactions = self.select_transactions(parent) if self.mempool else []
+                   ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 278, in select_transactions
+    raise NotImplementedError("TODO B2 implement select_transactions")
+NotImplementedError: TODO B2 implement select_transactions
+
+======================================================================
+ERROR: test_three_chain_and_transfer (tests.test_integration.HotStuffTests.test_three_chain_and_transfer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 27, in test_three_chain_and_transfer
+    self.advance_until(lambda: "B2" in self.demo.qcs)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\tests\test_integration.py", line 13, in advance_until
+    self.demo.step()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 84, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     "next_view": self.next_view, "timeout": self.timeout}[action](data)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 113, in propose
+    transactions = self.select_transactions(parent) if self.mempool else []
+                   ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\柳逸凡\Desktop\polyu\区块链分布式算法周三晚5567\project\hotstuff\backend\hotstuff.py", line 278, in select_transactions
+    raise NotImplementedError("TODO B2 implement select_transactions")
+NotImplementedError: TODO B2 implement select_transactions
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.020s
+
+FAILED (errors=11)

@@ -1,0 +1,8 @@
+test_initial_snapshot (tests.test_framework.FrameworkTests.test_initial_snapshot) ... ok
+test_missing_event_can_be_retried (tests.test_framework.FrameworkTests.test_missing_event_can_be_retried) ... ok
+test_reset_framework (tests.test_framework.FrameworkTests.test_reset_framework) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK

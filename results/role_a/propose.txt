@@ -1,0 +1,11 @@
+test_block_id_is_unique (tests.test_role_a_propose.RoleAProposalTests.test_block_id_is_unique) ... ok
+test_crashed_leader_schedules_timeout_without_proposal (tests.test_role_a_propose.RoleAProposalTests.test_crashed_leader_schedules_timeout_without_proposal) ... ok
+test_crashed_nonleader_is_not_a_recipient (tests.test_role_a_propose.RoleAProposalTests.test_crashed_nonleader_is_not_a_recipient) ... ok
+test_empty_proposal_uses_high_qc_and_preserves_state (tests.test_role_a_propose.RoleAProposalTests.test_empty_proposal_uses_high_qc_and_preserves_state) ... ok
+test_nonempty_pool_delegates_selection_without_consuming_pool (tests.test_role_a_propose.RoleAProposalTests.test_nonempty_pool_delegates_selection_without_consuming_pool) ... ok
+test_proposal_follows_current_leaders_high_qc (tests.test_role_a_propose.RoleAProposalTests.test_proposal_follows_current_leaders_high_qc) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.004s
+
+OK

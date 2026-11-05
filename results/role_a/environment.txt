@@ -1,0 +1,5 @@
+Python 3.13.14
+No broken requirements found.
+fastapi=0.162.0
+uvicorn=0.54.0
+1d7d70b2c480cd67b60c4b2e581bdbdc31220dd2

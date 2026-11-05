@@ -25,14 +25,44 @@ class Node:
         """A2 test whether block_id descends from ancestor_id, including itself.
         Use local parent links. Unknown or malformed ancestry must not be
         accepted as an extension. Return a Boolean without modifying state."""
-        raise NotImplementedError('TODO A2 test whether block_id descends from ancestor_id, including itself.')
+        # AI-assisted implementation; see changes.md.
+        if not isinstance(block_id, str) or not isinstance(ancestor_id, str):
+            return False
+        if not isinstance(self.blocks.get(ancestor_id), Block):
+            return False
+
+        current_id = block_id
+        visited = set()
+        while isinstance(current_id, str) and current_id not in visited:
+            block = self.blocks.get(current_id)
+            if not isinstance(block, Block):
+                return False
+            if current_id == ancestor_id:
+                return True
+            visited.add(current_id)
+            current_id = block.parent_id
+        return False
 
     def can_vote(self, block: Block) -> bool:
         """A2 decide whether this replica may vote for a proposal.
         Enforce availability, current view, one vote per view and the safe-node
         lock rule. Return a Boolean; vote() records the actual cast vote.
         The coordinator validates the proposal leader and parent certificate."""
-        raise NotImplementedError('TODO A2 decide whether this replica may vote for a proposal.')
+        # AI-assisted implementation; see changes.md.
+        if not isinstance(block, Block) or self.crashed or self.withhold_vote:
+            return False
+        if block.view != self.view or self.last_voted_view >= block.view:
+            return False
+        if not isinstance(block.qc, QC) or not isinstance(self.locked_qc, QC):
+            return False
+        if not isinstance(self.blocks.get(self.locked_qc.block_id), Block):
+            return False
+
+        # A direct child is already an extension even before local registration.
+        extends_locked = (block.parent_id == self.locked_qc.block_id or
+                          self.extends(block.id, self.locked_qc.block_id))
+        newer_qc = block.qc.view > self.locked_qc.view
+        return extends_locked or newer_qc
 
     def receive_qc(self, qc: QC) -> list[str]:
         """A4 update certificate/lock state and decide committed block IDs.

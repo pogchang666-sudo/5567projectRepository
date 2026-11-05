@@ -55,7 +55,22 @@ class HotStuffDemo:
         in [1, 1000000]. Invalid requests must not modify state. Allocate Tx1,
         Tx2, ... for the basic task. B6 may extend this interface for signed input.
         Do not execute transfers here."""
-        raise NotImplementedError('TODO B1 implement transaction admission and mempool insertion.')
+        # AI-assisted implementation; see changes.md.
+        if not isinstance(sender, str) or not isinstance(receiver, str):
+            raise ValueError("Sender and receiver must be account names")
+        if sender not in INITIAL_BALANCES or receiver not in INITIAL_BALANCES:
+            raise ValueError("Unknown sender or receiver account")
+        if type(amount) is not int or not 1 <= amount <= 1_000_000:
+            raise ValueError("Amount must be an integer in [1, 1000000]")
+
+        tx_number = len(self.transactions) + 1
+        while f"Tx{tx_number}" in self.transactions:
+            tx_number += 1
+        tx = Transaction(f"Tx{tx_number}", sender, receiver, amount)
+        self.transactions[tx.id] = tx
+        self.mempool.append(tx.id)
+        self.log(f"{tx.id} accepted: {sender} → {receiver} · {amount}", "transaction")
+        return tx
 
     def step(self):
         """Provided event dispatcher; a missing TODO pauses without losing work."""
@@ -83,7 +98,34 @@ class HotStuffDemo:
         Call select_transactions(parent) only when the mempool is nonempty;
         otherwise use an empty payload, allowing independent Task A work.
         A6: handle a crashed leader using the timeout event. No balances change."""
-        raise NotImplementedError('TODO A1 implement a leader proposal for the current view.')
+        # AI-assisted implementation; see changes.md.
+        leader = self.nodes[self.leader_id - 1]
+        if leader.crashed:
+            self.events.append(("timeout", self.TIMEOUT_TICKS))
+            self.phase = f"Leader N{leader.id} crashed; timeout scheduled"
+            self.log(self.phase, "fault")
+            return
+
+        parent = self.blocks[leader.high_qc.block_id]
+        justification = self.qcs[parent.id]
+        transactions = self.select_transactions(parent) if self.mempool else []
+
+        block_number = len(self.blocks)
+        while f"B{block_number}" in self.blocks:
+            block_number += 1
+        block_id = f"B{block_number}"
+        block = Block(block_id, parent.id, self.view, self.leader_id,
+                      transactions, justification)
+        self.blocks[block_id] = block
+        self.votes[block_id] = set()
+
+        for node in self.nodes:
+            if not node.crashed:
+                node.blocks[block_id] = deepcopy(block)
+                self.events.append(("vote", (node.id, block_id)))
+
+        self.phase = f"{block_id} proposed by N{self.leader_id}"
+        self.log(f"{self.phase} · view {self.view} · parent {parent.id}", "proposal")
 
     def vote(self, data):
         """A2 implement proposal validation and one safe vote per replica/view.
@@ -92,7 +134,61 @@ class HotStuffDemo:
         distinct voters. Once a quorum is reached, enqueue a single ("qc", id)
         event. Reject invalid proposals without changing voting or account state.
         A6: schedule a timeout if this round cannot obtain a QC."""
-        raise NotImplementedError('TODO A2 implement proposal validation and one safe vote per replica/view.')
+        # AI-assisted implementation; see changes.md.
+        try:
+            node_id, block_id = data
+        except (TypeError, ValueError):
+            return False
+        if type(node_id) is not int or not isinstance(block_id, str):
+            return False
+        if not 1 <= node_id <= self.NODE_COUNT:
+            return False
+
+        node = self.nodes[node_id - 1]
+        block = self.blocks.get(block_id)
+        local_block = node.blocks.get(block_id)
+        if not isinstance(block, Block) or not isinstance(local_block, Block):
+            return False
+        if local_block != block:
+            return False
+        if block.proposer != self.leader_id or block.view != self.view:
+            return False
+        if not isinstance(block.parent_id, str):
+            return False
+
+        parent = self.blocks.get(block.parent_id)
+        local_parent = node.blocks.get(block.parent_id)
+        if not isinstance(parent, Block) or not isinstance(local_parent, Block):
+            return False
+        if local_parent != parent or parent.id == block.id or parent.view >= block.view:
+            return False
+
+        qc = self.qcs.get(parent.id)
+        if not isinstance(qc, QC) or block.qc != qc:
+            return False
+        if qc.block_id != parent.id or qc.view != parent.view:
+            return False
+        if not isinstance(qc.voters, tuple):
+            return False
+        if any(type(voter) is not int or not 1 <= voter <= self.NODE_COUNT
+               for voter in qc.voters):
+            return False
+        if len(set(qc.voters)) != len(qc.voters) or len(qc.voters) < self.QUORUM:
+            return False
+        if not node.can_vote(block):
+            return False
+
+        node.last_voted_view = block.view
+        voters = self.votes.setdefault(block_id, set())
+        voters.add(node_id)
+        self.phase = f"N{node_id} voted {block_id} · {len(voters)} votes"
+        self.log(self.phase, "vote")
+
+        if len(voters) >= self.QUORUM and block_id not in self.qc_scheduled:
+            self.qc_scheduled.add(block_id)
+            self.events.append(("qc", block_id))
+            self.log(f"Quorum reached for {block_id}", "qc")
+        return True
 
     def form_qc(self, block_id):
         """A3 construct a certificate from distinct valid matching votes.

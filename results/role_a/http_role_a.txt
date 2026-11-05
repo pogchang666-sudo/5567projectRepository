@@ -1,0 +1,6 @@
+{'detail': None, 'steps': 1, 'phase': 'B1 proposed by N1', 'next_event': 'vote', 'B1_votes': []}
+{'detail': None, 'steps': 2, 'phase': 'N1 voted B1 · 1 votes', 'next_event': 'vote', 'B1_votes': [1]}
+{'detail': None, 'steps': 3, 'phase': 'N2 voted B1 · 2 votes', 'next_event': 'vote', 'B1_votes': [1, 2]}
+{'detail': None, 'steps': 4, 'phase': 'N3 voted B1 · 3 votes', 'next_event': 'vote', 'B1_votes': [1, 2, 3]}
+{'detail': None, 'steps': 5, 'phase': 'N4 voted B1 · 4 votes', 'next_event': 'qc', 'B1_votes': [1, 2, 3, 4]}
+{'detail': 'TODO A3 construct a certificate from distinct valid matching votes.', 'steps': 5, 'phase': 'TODO A3 construct a certificate from distinct valid matching votes.', 'next_event': 'qc', 'B1_votes': [1, 2, 3, 4]}
