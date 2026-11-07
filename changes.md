@@ -8,8 +8,13 @@ Final commit: TO FILL
 | A（柳逸凡） | A1 Proposal | `backend/hotstuff.py::HotStuffDemo.propose()` | `test_role_a_propose.py`：6/6 |
 | A（柳逸凡） | A2 Safe voting | `HotStuffDemo.vote()`；`Node.extends()`、`Node.can_vote()` | `test_role_a_voting.py`：10/10；公开 lock/one-vote 用例通过 |
 | A（柳逸凡） | B1 Admission | `backend/hotstuff.py::HotStuffDemo.submit()` | `test_role_a_submit.py`：5/5；公开 admission/invalid-input 用例通过 |
+| B（姓名待填） | A3 Quorum certificate | `backend/hotstuff.py::HotStuffDemo.form_qc()` | `test_role_b_qc.py`：7/7；公开 quorum 用例通过 |
+| B（姓名待填） | A4 Lock and commit | `backend/node.py::Node.receive_qc()` | `test_role_b_commit.py`：8/8；公开 one-QC 与三链用例通过 |
+| B（姓名待填） | A5 Normal view change | `HotStuffDemo.next_view()`；`Node.enter_view()` | `test_role_b_view.py`：6/6 |
+| B（姓名待填） | B2 Block payload | `HotStuffDemo.select_transactions()` | `test_role_b_payload.py`：8/8；公开 pool/ancestry 用例通过 |
 
 角色 A 定向测试合计 21/21；framework 3/3；原始输出见 `results/role_a/`。
+角色 B 定向测试合计 29/29；HTTP 演示记录见 `results/role_b/`。
 
 ## Completed extensions
 
@@ -17,7 +22,7 @@ None. A1 的崩溃 leader timeout 调度不构成 A6 完成。
 
 ## Incomplete requirements
 
-角色 A 的 A1、A2、B1 已完成模块实现与独立测试；完整 Task A/B 尚未完成。A3～A5、B2～B5 及端到端集成仍依赖对应负责人；A6/A7/B6 未实现。完整公开集当前 6/17 通过，11 个错误均来自 B/C TODO。
+角色 A 的 A1、A2、B1 与角色 B 的 A3、A4、A5、B2 已完成模块实现与独立测试。B3、B4（`Node.execute_committed`、`StateMachine.apply`、`finalize_transactions`）尚未实现，端到端集成待其完成；HTTP 记录显示提交带交易区块时停在 `TODO B3`。A6/A7/B5/B6 未实现。完整公开集当前 11/17 通过，6 个错误均来自 B3/B4。
 
 ## AI assistance disclosure
 

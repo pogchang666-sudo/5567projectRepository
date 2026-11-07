@@ -1,0 +1,197 @@
+{
+  "view": 1,
+  "leader_id": 1,
+  "running": false,
+  "steps": 0,
+  "phase": "Ready for proposal",
+  "nodes": [
+    {
+      "id": 1,
+      "view": 1,
+      "role": "Leader",
+      "crashed": false,
+      "withhold_vote": false,
+      "high_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "locked_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "latest_block": "B0",
+      "committed_blocks": [
+        "B0"
+      ],
+      "accounts": {
+        "Alice": 100,
+        "Bob": 100,
+        "Charlie": 100
+      }
+    },
+    {
+      "id": 2,
+      "view": 1,
+      "role": "Replica",
+      "crashed": false,
+      "withhold_vote": false,
+      "high_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "locked_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "latest_block": "B0",
+      "committed_blocks": [
+        "B0"
+      ],
+      "accounts": {
+        "Alice": 100,
+        "Bob": 100,
+        "Charlie": 100
+      }
+    },
+    {
+      "id": 3,
+      "view": 1,
+      "role": "Replica",
+      "crashed": false,
+      "withhold_vote": false,
+      "high_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "locked_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "latest_block": "B0",
+      "committed_blocks": [
+        "B0"
+      ],
+      "accounts": {
+        "Alice": 100,
+        "Bob": 100,
+        "Charlie": 100
+      }
+    },
+    {
+      "id": 4,
+      "view": 1,
+      "role": "Replica",
+      "crashed": false,
+      "withhold_vote": false,
+      "high_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "locked_qc": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "latest_block": "B0",
+      "committed_blocks": [
+        "B0"
+      ],
+      "accounts": {
+        "Alice": 100,
+        "Bob": 100,
+        "Charlie": 100
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "B0",
+      "parent_id": null,
+      "view": 0,
+      "proposer": 0,
+      "transactions": [],
+      "qc": null,
+      "certificate": {
+        "block_id": "B0",
+        "view": 0,
+        "voters": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "committed": true,
+      "votes": []
+    }
+  ],
+  "mempool": [],
+  "transactions": [],
+  "accounts": {
+    "Alice": 100,
+    "Bob": 100,
+    "Charlie": 100
+  },
+  "committed_chain": [
+    "B0"
+  ],
+  "consistent": true,
+  "logs": [
+    {
+      "id": 1,
+      "step": 0,
+      "view": 1,
+      "kind": "view",
+      "message": "Genesis B0 committed · Enter View 1 · Leader N1"
+    }
+  ],
+  "quorum": 3,
+  "next_event": "propose"
+}
