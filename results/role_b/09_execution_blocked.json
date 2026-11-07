@@ -1,0 +1,484 @@
+{
+  "detail": "TODO B3 implement execute_committed",
+  "state": {
+    "view": 3,
+    "leader_id": 3,
+    "running": false,
+    "steps": 19,
+    "phase": "TODO B3 implement execute_committed",
+    "nodes": [
+      {
+        "id": 1,
+        "view": 3,
+        "role": "Replica",
+        "crashed": false,
+        "withhold_vote": false,
+        "high_qc": {
+          "block_id": "B2",
+          "view": 2,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "locked_qc": {
+          "block_id": "B1",
+          "view": 1,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "latest_block": "B3",
+        "committed_blocks": [
+          "B0"
+        ],
+        "accounts": {
+          "Alice": 100,
+          "Bob": 100,
+          "Charlie": 100
+        }
+      },
+      {
+        "id": 2,
+        "view": 3,
+        "role": "Replica",
+        "crashed": false,
+        "withhold_vote": false,
+        "high_qc": {
+          "block_id": "B2",
+          "view": 2,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "locked_qc": {
+          "block_id": "B1",
+          "view": 1,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "latest_block": "B3",
+        "committed_blocks": [
+          "B0"
+        ],
+        "accounts": {
+          "Alice": 100,
+          "Bob": 100,
+          "Charlie": 100
+        }
+      },
+      {
+        "id": 3,
+        "view": 3,
+        "role": "Leader",
+        "crashed": false,
+        "withhold_vote": false,
+        "high_qc": {
+          "block_id": "B2",
+          "view": 2,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "locked_qc": {
+          "block_id": "B1",
+          "view": 1,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "latest_block": "B3",
+        "committed_blocks": [
+          "B0"
+        ],
+        "accounts": {
+          "Alice": 100,
+          "Bob": 100,
+          "Charlie": 100
+        }
+      },
+      {
+        "id": 4,
+        "view": 3,
+        "role": "Replica",
+        "crashed": false,
+        "withhold_vote": false,
+        "high_qc": {
+          "block_id": "B2",
+          "view": 2,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "locked_qc": {
+          "block_id": "B1",
+          "view": 1,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "latest_block": "B3",
+        "committed_blocks": [
+          "B0"
+        ],
+        "accounts": {
+          "Alice": 100,
+          "Bob": 100,
+          "Charlie": 100
+        }
+      }
+    ],
+    "blocks": [
+      {
+        "id": "B0",
+        "parent_id": null,
+        "view": 0,
+        "proposer": 0,
+        "transactions": [],
+        "qc": null,
+        "certificate": {
+          "block_id": "B0",
+          "view": 0,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "committed": true,
+        "votes": []
+      },
+      {
+        "id": "B1",
+        "parent_id": "B0",
+        "view": 1,
+        "proposer": 1,
+        "transactions": [
+          {
+            "id": "Tx1",
+            "sender": "Alice",
+            "receiver": "Bob",
+            "amount": 10
+          }
+        ],
+        "qc": {
+          "block_id": "B0",
+          "view": 0,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "certificate": {
+          "block_id": "B1",
+          "view": 1,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "committed": false,
+        "votes": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "id": "B2",
+        "parent_id": "B1",
+        "view": 2,
+        "proposer": 2,
+        "transactions": [],
+        "qc": {
+          "block_id": "B1",
+          "view": 1,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "certificate": {
+          "block_id": "B2",
+          "view": 2,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "committed": false,
+        "votes": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "id": "B3",
+        "parent_id": "B2",
+        "view": 3,
+        "proposer": 3,
+        "transactions": [],
+        "qc": {
+          "block_id": "B2",
+          "view": 2,
+          "voters": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "certificate": null,
+        "committed": false,
+        "votes": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    ],
+    "mempool": [
+      {
+        "id": "Tx1",
+        "sender": "Alice",
+        "receiver": "Bob",
+        "amount": 10
+      }
+    ],
+    "transactions": [
+      {
+        "id": "Tx1",
+        "sender": "Alice",
+        "receiver": "Bob",
+        "amount": 10,
+        "status": "pending",
+        "error": null
+      }
+    ],
+    "accounts": {
+      "Alice": 100,
+      "Bob": 100,
+      "Charlie": 100
+    },
+    "committed_chain": [
+      "B0"
+    ],
+    "consistent": true,
+    "logs": [
+      {
+        "id": 1,
+        "step": 0,
+        "view": 1,
+        "kind": "view",
+        "message": "Genesis B0 committed · Enter View 1 · Leader N1"
+      },
+      {
+        "id": 2,
+        "step": 0,
+        "view": 1,
+        "kind": "transaction",
+        "message": "Tx1 accepted: Alice → Bob · 10"
+      },
+      {
+        "id": 3,
+        "step": 1,
+        "view": 1,
+        "kind": "proposal",
+        "message": "B1 proposed by N1 · view 1 · parent B0"
+      },
+      {
+        "id": 4,
+        "step": 2,
+        "view": 1,
+        "kind": "vote",
+        "message": "N1 voted B1 · 1 votes"
+      },
+      {
+        "id": 5,
+        "step": 3,
+        "view": 1,
+        "kind": "vote",
+        "message": "N2 voted B1 · 2 votes"
+      },
+      {
+        "id": 6,
+        "step": 4,
+        "view": 1,
+        "kind": "vote",
+        "message": "N3 voted B1 · 3 votes"
+      },
+      {
+        "id": 7,
+        "step": 4,
+        "view": 1,
+        "kind": "qc",
+        "message": "Quorum reached for B1"
+      },
+      {
+        "id": 8,
+        "step": 5,
+        "view": 1,
+        "kind": "vote",
+        "message": "N4 voted B1 · 4 votes"
+      },
+      {
+        "id": 9,
+        "step": 6,
+        "view": 1,
+        "kind": "qc",
+        "message": "QC for B1 · view 1 · voters [1, 2, 3, 4]"
+      },
+      {
+        "id": 10,
+        "step": 7,
+        "view": 2,
+        "kind": "view",
+        "message": "Enter view 2 after QC · leader N2"
+      },
+      {
+        "id": 11,
+        "step": 8,
+        "view": 2,
+        "kind": "proposal",
+        "message": "B2 proposed by N2 · view 2 · parent B1"
+      },
+      {
+        "id": 12,
+        "step": 9,
+        "view": 2,
+        "kind": "vote",
+        "message": "N1 voted B2 · 1 votes"
+      },
+      {
+        "id": 13,
+        "step": 10,
+        "view": 2,
+        "kind": "vote",
+        "message": "N2 voted B2 · 2 votes"
+      },
+      {
+        "id": 14,
+        "step": 11,
+        "view": 2,
+        "kind": "vote",
+        "message": "N3 voted B2 · 3 votes"
+      },
+      {
+        "id": 15,
+        "step": 11,
+        "view": 2,
+        "kind": "qc",
+        "message": "Quorum reached for B2"
+      },
+      {
+        "id": 16,
+        "step": 12,
+        "view": 2,
+        "kind": "vote",
+        "message": "N4 voted B2 · 4 votes"
+      },
+      {
+        "id": 17,
+        "step": 13,
+        "view": 2,
+        "kind": "qc",
+        "message": "QC for B2 · view 2 · voters [1, 2, 3, 4]"
+      },
+      {
+        "id": 18,
+        "step": 14,
+        "view": 3,
+        "kind": "view",
+        "message": "Enter view 3 after QC · leader N3"
+      },
+      {
+        "id": 19,
+        "step": 15,
+        "view": 3,
+        "kind": "proposal",
+        "message": "B3 proposed by N3 · view 3 · parent B2"
+      },
+      {
+        "id": 20,
+        "step": 16,
+        "view": 3,
+        "kind": "vote",
+        "message": "N1 voted B3 · 1 votes"
+      },
+      {
+        "id": 21,
+        "step": 17,
+        "view": 3,
+        "kind": "vote",
+        "message": "N2 voted B3 · 2 votes"
+      },
+      {
+        "id": 22,
+        "step": 18,
+        "view": 3,
+        "kind": "vote",
+        "message": "N3 voted B3 · 3 votes"
+      },
+      {
+        "id": 23,
+        "step": 18,
+        "view": 3,
+        "kind": "qc",
+        "message": "Quorum reached for B3"
+      },
+      {
+        "id": 24,
+        "step": 19,
+        "view": 3,
+        "kind": "vote",
+        "message": "N4 voted B3 · 4 votes"
+      },
+      {
+        "id": 25,
+        "step": 19,
+        "view": 3,
+        "kind": "todo",
+        "message": "TODO B3 implement execute_committed"
+      }
+    ],
+    "quorum": 3,
+    "next_event": "qc"
+  }
+}
