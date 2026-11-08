@@ -1,0 +1,11 @@
+test_invalid_transfer_records_rejection_without_changing_balances (test_role_c_apply.RoleCApplyTests.test_invalid_transfer_records_rejection_without_changing_balances) ... ok
+test_rejected_transaction_stays_rejected_after_balance_increases (test_role_c_apply.RoleCApplyTests.test_rejected_transaction_stays_rejected_after_balance_increases) ... ok
+test_block_and_payload_order_enable_later_transfers (test_role_c_execute.RoleCExecuteTests.test_block_and_payload_order_enable_later_transfers) ... ok
+test_crashed_replica_does_not_apply_a_committed_block (test_role_c_execute.RoleCExecuteTests.test_crashed_replica_does_not_apply_a_committed_block) ... ok
+test_mixed_batch_leaves_balances_and_receipts_untouched (test_role_c_execute.RoleCExecuteTests.test_mixed_batch_leaves_balances_and_receipts_untouched) ... ok
+test_finalization_cleans_both_outcomes_and_preserves_pending_order (test_role_c_finalize.RoleCFinalizeTests.test_finalization_cleans_both_outcomes_and_preserves_pending_order) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

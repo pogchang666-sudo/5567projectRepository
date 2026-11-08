@@ -280,7 +280,21 @@ class HotStuffDemo:
         and record useful transaction events. Repeated finalization is harmless.
         This method does not execute transfers or decide consensus.
         """
-        raise NotImplementedError("TODO B4 implement finalize_transactions")
+        pending = set(self.mempool)
+        for block_id in committed_ids:
+            block = self.blocks[block_id]
+            for tx in block.transactions:
+                if tx.id not in pending:
+                    continue
+                # A lagging or crashed replica may not have executed this block.
+                receipt = next((n.machine.receipts[tx.id] for n in self.nodes
+                                if block_id in n.committed_blocks and tx.id in n.machine.receipts), None)
+                if receipt is None:
+                    continue
+                pending.remove(tx.id)
+                detail = f": {receipt['error']}" if receipt["error"] else ""
+                self.log(f"{tx.id} {receipt['status']} in {block_id}{detail}", "transaction")
+        self.mempool[:] = [tx_id for tx_id in self.mempool if tx_id in pending]
 
     def configure_batch(self, limit):
         """B5 set a positive integer batch limit and return the accepted value.

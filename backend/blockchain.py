@@ -18,5 +18,21 @@ class StateMachine:
         status committed or rejected and error None or an explanatory string.
         Reusing a transaction ID returns its prior receipt without another debit.
         B6 extends this with signature verification, nonces and stable identities."""
-        raise NotImplementedError('TODO B3 B4 validate and deterministically execute one committed transaction.')
+        if tx.id in self.receipts:
+            return self.receipts[tx.id]
+
+        error = None
+        if tx.sender not in self.accounts or tx.receiver not in self.accounts:
+            error = "Unknown sender or receiver account"
+        elif type(tx.amount) is not int or tx.amount <= 0:
+            error = "Amount must be a positive integer"
+        elif self.accounts[tx.sender] < tx.amount:
+            error = "Insufficient funds"
+        else:
+            self.accounts[tx.sender] -= tx.amount
+            self.accounts[tx.receiver] += tx.amount
+
+        receipt = {"status": "committed" if error is None else "rejected", "error": error}
+        self.receipts[tx.id] = receipt
+        return receipt
 

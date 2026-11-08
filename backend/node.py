@@ -81,4 +81,17 @@ class Node:
         and payload order; call machine.apply() and rely on B4 receipt semantics
         for repeat delivery. A crashed replica must not execute new work.
         """
-        raise NotImplementedError("TODO B3 implement execute_committed")
+        if self.crashed:
+            return
+
+        # Validate the whole batch before the first debit.
+        committed = set(self.committed_blocks)
+        blocks = []
+        for block_id in block_ids:
+            if block_id not in committed or block_id not in self.blocks:
+                raise ValueError(f"Block {block_id} is not committed on N{self.id}")
+            blocks.append(self.blocks[block_id])
+
+        for block in blocks:
+            for tx in block.transactions:
+                self.machine.apply(tx)
