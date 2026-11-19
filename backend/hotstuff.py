@@ -196,7 +196,23 @@ class HotStuffDemo:
         never create a QC. Register the valid certificate, call dispatch_qc(qc),
         and enqueue ("next_view", "QC"). A6 handles a crashed collector.
         Do not implement transaction processing in this function."""
-        raise NotImplementedError('TODO A3 construct a certificate from distinct valid matching votes.')
+        block = self.blocks.get(block_id)
+        if not isinstance(block, Block):
+            raise ValueError(f"Unknown block: {block_id}")
+
+        voters = sorted(voter for voter in self.votes.get(block_id, set())
+                        if type(voter) is int and 1 <= voter <= self.NODE_COUNT)
+        if len(voters) < self.QUORUM:
+            raise ValueError(
+                f"{block_id} has {len(voters)} distinct votes, quorum is {self.QUORUM}")
+
+        qc = QC(block_id, block.view, tuple(voters))
+        self.qcs[block_id] = qc
+        self.log(f"QC for {block_id} · view {block.view} · voters {voters}", "qc")
+
+        self.dispatch_qc(qc)
+        self.events.append(("next_view", "QC"))
+        return qc
 
     def timeout(self, remaining):
         """A6 implement logical timeout countdown and leader replacement.
@@ -208,7 +224,12 @@ class HotStuffDemo:
         """A5 implement view increment, leader rotation and replica updates.
         Preserve QCs, locks and committed history. Call each node's enter_view
         as appropriate and enqueue the next proposal event."""
-        raise NotImplementedError('TODO A5 implement view increment, leader rotation and replica updates.')
+        self.view += 1
+        for node in self.nodes:
+            node.enter_view(self.view, self.leader_id)
+        self.phase = f"View {self.view} · leader N{self.leader_id}"
+        self.log(f"Enter view {self.view} after {reason} · leader N{self.leader_id}", "view")
+        self.events.append(("propose", None))
 
     def crash_leader(self):
         leader = self.nodes[self.leader_id - 1]
@@ -271,7 +292,31 @@ class HotStuffDemo:
         on the selected parent chain. An abandoned branch does not exclude an ID.
         Empty input returns an empty list. Keep IDs in the pool until commit.
         """
-        raise NotImplementedError("TODO B2 implement select_transactions")
+        if not isinstance(parent, Block):
+            return []
+
+        on_parent_chain: set[str] = set()
+        current: str | None = parent.id
+        visited: set[str] = set()
+        while isinstance(current, str) and current not in visited:
+            visited.add(current)
+            block = self.blocks.get(current)
+            if not isinstance(block, Block):
+                break
+            on_parent_chain.update(transaction.id for transaction in block.transactions)
+            current = block.parent_id
+
+        selected: list[Transaction] = []
+        for tx_id in self.mempool:
+            if tx_id in on_parent_chain:
+                continue
+            transaction = self.transactions.get(tx_id)
+            if not isinstance(transaction, Transaction):
+                continue
+            selected.append(transaction)
+            if len(selected) >= self.max_txs_per_block:
+                break
+        return selected
 
     def finalize_transactions(self, committed_ids: list[str]):
         """B4 finalize pool entries after per-replica execution.
@@ -280,7 +325,22 @@ class HotStuffDemo:
         and record useful transaction events. Repeated finalization is harmless.
         This method does not execute transfers or decide consensus.
         """
-        raise NotImplementedError("TODO B4 implement finalize_transactions")
+        # AI-assisted implementation; see changes.md.
+        pending = set(self.mempool)
+        for block_id in committed_ids:
+            block = self.blocks[block_id]
+            for tx in block.transactions:
+                if tx.id not in pending:
+                    continue
+                # A lagging or crashed replica may not have executed this block.
+                receipt = next((n.machine.receipts[tx.id] for n in self.nodes
+                                if block_id in n.committed_blocks and tx.id in n.machine.receipts), None)
+                if receipt is None:
+                    continue
+                pending.remove(tx.id)
+                detail = f": {receipt['error']}" if receipt["error"] else ""
+                self.log(f"{tx.id} {receipt['status']} in {block_id}{detail}", "transaction")
+        self.mempool[:] = [tx_id for tx_id in self.mempool if tx_id in pending]
 
     def configure_batch(self, limit):
         """B5 set a positive integer batch limit and return the accepted value.

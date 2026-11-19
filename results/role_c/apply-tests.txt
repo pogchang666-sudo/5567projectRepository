@@ -1,0 +1,8 @@
+test_invalid_transfer_records_rejection_without_changing_balances (tests.test_role_c_apply.RoleCApplyTests.test_invalid_transfer_records_rejection_without_changing_balances) ... ok
+test_rejected_transaction_stays_rejected_after_balance_increases (tests.test_role_c_apply.RoleCApplyTests.test_rejected_transaction_stays_rejected_after_balance_increases) ... ok
+test_insufficient_balance_and_same_id_retry (tests.test_task_b.TaskBTests.test_insufficient_balance_and_same_id_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

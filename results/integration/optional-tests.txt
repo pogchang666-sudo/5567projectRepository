@@ -1,0 +1,82 @@
+test_limits (test_batch.BatchExtensionTests.test_limits) ... ERROR
+test_reject_invalid (test_batch.BatchExtensionTests.test_reject_invalid) ... ERROR
+test_crash_leader_timeout_and_recovery (test_recovery.HotStuffTests.test_crash_leader_timeout_and_recovery) ... ERROR
+test_one_byzantine_replica_and_leader_rotation (test_recovery.HotStuffTests.test_one_byzantine_replica_and_leader_rotation) ... ok
+test_orphaned_transaction_is_reproposed (test_recovery.HotStuffTests.test_orphaned_transaction_is_reproposed) ... FAIL
+test_two_unavailable_voters_stall_without_false_qc (test_recovery.HotStuffTests.test_two_unavailable_voters_stall_without_false_qc) ... ERROR
+test_view_gap_delays_commit_until_consecutive_chain (test_recovery.HotStuffTests.test_view_gap_delays_commit_until_consecutive_chain) ... ERROR
+
+======================================================================
+ERROR: test_limits (test_batch.BatchExtensionTests.test_limits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_batch.py", line 7, in test_limits
+    d=HotStuffDemo();d.configure_batch(limit)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 349, in configure_batch
+    raise NotImplementedError("TODO B5 implement configure_batch")
+NotImplementedError: TODO B5 implement configure_batch
+
+======================================================================
+ERROR: test_reject_invalid (test_batch.BatchExtensionTests.test_reject_invalid)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_batch.py", line 14, in test_reject_invalid
+    with self.assertRaises(ValueError):d.configure_batch(invalid)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 349, in configure_batch
+    raise NotImplementedError("TODO B5 implement configure_batch")
+NotImplementedError: TODO B5 implement configure_batch
+
+======================================================================
+ERROR: test_crash_leader_timeout_and_recovery (test_recovery.HotStuffTests.test_crash_leader_timeout_and_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_recovery.py", line 28, in test_crash_leader_timeout_and_recovery
+    self.advance_until(lambda: self.demo.view == 2)
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_recovery.py", line 13, in advance_until
+    self.demo.step()
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 83, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 221, in timeout
+    raise NotImplementedError('TODO A6 implement logical timeout countdown and leader replacement.')
+NotImplementedError: TODO A6 implement logical timeout countdown and leader replacement.
+
+======================================================================
+ERROR: test_two_unavailable_voters_stall_without_false_qc (test_recovery.HotStuffTests.test_two_unavailable_voters_stall_without_false_qc)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_recovery.py", line 52, in test_two_unavailable_voters_stall_without_false_qc
+    self.demo.step()
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 83, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 221, in timeout
+    raise NotImplementedError('TODO A6 implement logical timeout countdown and leader replacement.')
+NotImplementedError: TODO A6 implement logical timeout countdown and leader replacement.
+
+======================================================================
+ERROR: test_view_gap_delays_commit_until_consecutive_chain (test_recovery.HotStuffTests.test_view_gap_delays_commit_until_consecutive_chain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_recovery.py", line 71, in test_view_gap_delays_commit_until_consecutive_chain
+    self.advance_until(lambda: self.demo.view == 5)
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_recovery.py", line 13, in advance_until
+    self.demo.step()
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 83, in step
+    {"propose": self.propose, "vote": self.vote, "qc": self.form_qc,
+  File "/Users/hechang/Desktop/5567projectRepository-main/backend/hotstuff.py", line 221, in timeout
+    raise NotImplementedError('TODO A6 implement logical timeout countdown and leader replacement.')
+NotImplementedError: TODO A6 implement logical timeout countdown and leader replacement.
+
+======================================================================
+FAIL: test_orphaned_transaction_is_reproposed (test_recovery.HotStuffTests.test_orphaned_transaction_is_reproposed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/hechang/Desktop/5567projectRepository-main/extensions_tests/test_recovery.py", line 62, in test_orphaned_transaction_is_reproposed
+    self.assertNotIn("B1", self.demo.qcs)
+AssertionError: 'B1' unexpectedly found in {'B0': QC(block_id='B0', view=0, voters=(1, 2, 3, 4)), 'B1': QC(block_id='B1', view=1, voters=(2, 3, 4)), 'B2': QC(block_id='B2', view=2, voters=(2, 3, 4)), 'B3': QC(block_id='B3', view=3, voters=(2, 3, 4))}
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.010s
+
+FAILED (failures=1, errors=5)

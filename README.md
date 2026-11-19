@@ -2,9 +2,14 @@
 
 Implement the missing consensus (Task A, 35 marks) and blockchain-system
 (Task B, 30 marks) functions. The accompanying project specification defines
-the full 100-point assessment. This distribution intentionally has no working
+the full 100-point assessment. This distribution originally had no working
 consensus or transfer implementation. The dashboard and HTTP service start;
 calling an unimplemented operation returns a clear TODO message (HTTP 501).
+
+> **Integrated working tree (2026-11-15):** Role A, B and C work has been
+> merged. A1–A5 and B1–B4 are implemented, and the 73-test combined suite passes
+> (public acceptance 17/17). Optional A6/A7/B5/B6 remain TODO. See
+> [INTEGRATION.md](INTEGRATION.md) for sources, merge decisions and current evidence.
 
 ## Run
 
@@ -82,8 +87,9 @@ These framework checks pass in the unmodified starter:
 python -m unittest discover -s tests -p 'test_framework.py' -v
 ```
 
-The following are acceptance tests. They are EXPECTED TO FAIL with TODO errors
-until you implement the assessed functions. Do not skip or remove assertions.
+The following are acceptance tests. In the unmodified starter they fail with
+TODO errors; in this integrated working tree they all pass. Do not skip or
+remove assertions.
 
 ```bash
 python -m unittest discover -s tests -p 'test_task_a.py' -v
@@ -102,6 +108,11 @@ Run the relevant optional tests only when claiming the corresponding extension:
 python -m unittest discover -s extensions_tests -p 'test_recovery.py' -v
 python -m unittest discover -s extensions_tests -p 'test_batch.py' -v
 ```
+
+In this integrated working tree these optional tests still fail because A6
+(timeout/recovery) and B5 (batch configuration) are TODO; they are not part of
+the 73-test base suite. See
+[results/integration/optional-tests.txt](results/integration/optional-tests.txt).
 
 The five recovery/fault cases plus six integration cases preserve all eleven
 original regression tests. Add your own A7 and B6 tests for attack/tampering,

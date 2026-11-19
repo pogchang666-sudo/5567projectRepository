@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-11-15",
+  "python": "3.12.14",
+  "description": "End-to-end event-loop simulation after merging Role A, B and C.",
+  "single_transfer": {
+    "submitted": ["Tx1"],
+    "steps": 20,
+    "view": 3,
+    "committed_chain": ["B0", "B1"],
+    "accounts": {"Alice": 90, "Bob": 110, "Charlie": 100},
+    "receipts": {
+      "Tx1": {"status": "committed", "error": null}
+    },
+    "mempool": [],
+    "consistent": true,
+    "next_event": "next_view"
+  },
+  "insufficient_funds": {
+    "submitted": ["Tx1", "Tx2"],
+    "steps": 20,
+    "view": 3,
+    "committed_chain": ["B0", "B1"],
+    "accounts": {"Alice": 20, "Bob": 180, "Charlie": 100},
+    "receipts": {
+      "Tx1": {"status": "committed", "error": null},
+      "Tx2": {"status": "rejected", "error": "Insufficient funds"}
+    },
+    "mempool": [],
+    "consistent": true,
+    "next_event": "next_view"
+  }
+}

@@ -2,4 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.python/
 .env
+.gh-config/
+*.zip
+.DS_Store

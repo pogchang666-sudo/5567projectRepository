@@ -1,5 +1,10 @@
 # 角色 A 交接说明
 
+> 2026-11-15 集成更新：Role B 的 A3/A4/A5/B2 与 Role C 的 B3/B4 已合并到
+> 仓库根目录，完整测试 73/73 通过。本文以下内容保留 A 交接时的历史状态；
+> 当前合并说明与证据见 [INTEGRATION.md](INTEGRATION.md) 和
+> [results/integration/](results/integration/README.md)。
+
 日期：2026-11-05。Base：`1d7d70b2c480cd67b60c4b2e581bdbdc31220dd2`（starter 2026-09-29）。建议分支：`role-a`；最终 commit 以该分支 HEAD 为准。
 
 ## 1. 已完成内容
