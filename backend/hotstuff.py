@@ -347,7 +347,10 @@ class HotStuffDemo:
         Reject bool, zero, negatives and non-integers without changing state.
         Reset restores the default value 5 in this starter contract.
         """
-        raise NotImplementedError("TODO B5 implement configure_batch")
+        if type(limit) is not int or limit <= 0:
+            raise ValueError(f"Batch limit must be a positive integer, got {limit!r}")
+        self.max_txs_per_block = limit
+        return limit
 
     def inject_attack(self, kind: str, node_id: int):
         """A7 inject an active Byzantine action in the current experiment.
