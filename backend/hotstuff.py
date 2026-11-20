@@ -420,7 +420,86 @@ class HotStuffDemo:
         assertions. Do not count the supplied withholding switch as this task.
         A malicious replica controls only its own simulator identity.
         """
-        raise NotImplementedError("TODO A7 implement inject_attack")
+        # AI-assisted implementation; see changes.md.
+        if kind not in {"equivocation", "duplicate_vote"}:
+            raise ValueError("Unsupported attack kind")
+        if type(node_id) is not int or not 1 <= node_id <= self.NODE_COUNT:
+            raise ValueError("Node ID must be 1–4")
+        attacker = self.nodes[node_id - 1]
+        if attacker.crashed:
+            raise ValueError("A crashed replica cannot inject an attack")
+        if kind == "equivocation" and node_id != self.leader_id:
+            raise ValueError("Equivocation must use the current leader")
+
+        # Replace only an unstarted normal proposal; active attacks do not withhold.
+        self.events = deque(event for event in self.events if event[0] != "propose")
+        attacker.withhold_vote = False
+
+        if kind == "duplicate_vote":
+            proposals = [block for block in self.blocks.values()
+                         if block.view == self.view and block.proposer == self.leader_id]
+            if proposals:
+                block = proposals[-1]
+            else:
+                self.propose(None)
+                proposals = [candidate for candidate in self.blocks.values()
+                             if candidate.view == self.view
+                             and candidate.proposer == self.leader_id]
+                if not proposals:
+                    raise ValueError("No proposal is available for duplicate voting")
+                block = proposals[-1]
+
+            duplicate = ("vote", (node_id, block.id))
+            self.events = deque(event for event in self.events if event != duplicate)
+            self.events.extend([duplicate, duplicate])
+            self.phase = f"N{node_id} duplicate vote injected for {block.id}"
+            self.log(self.phase, "attack")
+            return block.id
+
+        proposals = [block for block in self.blocks.values()
+                     if block.view == self.view and block.proposer == node_id]
+        first = proposals[-1] if proposals else None
+        if first is not None:
+            parent = self.blocks.get(first.parent_id)
+        else:
+            parent = self.blocks.get(attacker.high_qc.block_id)
+        if not isinstance(parent, Block):
+            raise ValueError("A justified parent is required for equivocation")
+
+        next_number = len(self.blocks)
+        if first is None:
+            while f"B{next_number}" in self.blocks:
+                next_number += 1
+            transactions = self.select_transactions(parent) if self.mempool else []
+            first = Block(f"B{next_number}", parent.id, self.view, node_id,
+                          transactions, self.qcs[parent.id])
+            next_number += 1
+
+        while f"B{next_number}" in self.blocks:
+            next_number += 1
+        second = Block(f"B{next_number}", parent.id, self.view, node_id,
+                       list(reversed(first.transactions)), first.qc)
+        new_blocks = (first, second) if first.id not in self.blocks else (second,)
+        for block in new_blocks:
+            self.blocks[block.id] = block
+            self.votes[block.id] = set()
+            for node in self.nodes:
+                if not node.crashed:
+                    node.blocks[block.id] = deepcopy(block)
+
+        if len(new_blocks) == 2:
+            for block in new_blocks:
+                for node in self.nodes:
+                    if not node.crashed:
+                        self.events.append(("vote", (node.id, block.id)))
+        else:
+            for node in self.nodes:
+                if not node.crashed:
+                    self.events.append(("vote", (node.id, second.id)))
+
+        self.phase = f"N{node_id} equivocation: {first.id} vs {second.id}"
+        self.log(self.phase, "attack")
+        return first.id, second.id
 
     def dispatch_qc(self, qc: QC):
         """Provided integration wiring. Caller must validate/register the QC.

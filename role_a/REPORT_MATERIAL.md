@@ -1,6 +1,6 @@
 # 角色 A 报告素材（工作稿，非最终报告）
 
-版本：2026-11-05，base `1d7d70b`。A1、A2、B1 均有实现与实测；完整 Task A/B 仍需组内集成。
+版本：2026-11-20，基于 `extension-b@f3b22d01`。A1、A2、B1 已集成；A6、B5 与 A7 已完成联合回归。
 
 ## 2.1 Task A：提案与安全投票
 
@@ -25,6 +25,14 @@
 验证通过后调用 `can_vote()`；仅成功时更新 `last_voted_view` 并向 `votes[block_id]` 添加不同投票者。首次达到 quorum 时，通过 `qc_scheduled` 保证只入队一次 `("qc", block_id)`。无效提案在写入投票前返回 False；本函数不形成 QC、不提交区块、不执行交易。
 
 证据：`backend/hotstuff.py`、`backend/node.py`、`tests/test_role_a_voting.py`、`results/role_a/role_a_all.txt`。
+
+### A7 `inject_attack()`
+
+A7 选择 equivocation＋duplicate_vote。当前 leader 构造两个同 view、同父块但 ID 不同的提案，并分发给存活副本；既有每 view 一票规则使第二分支无法形成 QC 或提交。重复投票仅重放攻击者自己的 vote 事件，集合去重和 `last_voted_view` 保证只记一次、只形成一个 QC。
+
+攻击不直接写 QC、提交或余额，非法注入在状态修改前拒绝。A7 未修改 `vote()` 或 A6。集成后新增超时后新 leader 冲突提案、恢复后重复投票拒绝两项交叉测试，验证 pacemaker、recover 与攻击校验兼容。
+
+证据：`extensions_tests/test_role_a_attacks.py`、`results/role_a/a6-a7-tests.txt`。
 
 ## 2.3 Task B：交易接收与交易池
 
@@ -52,32 +60,32 @@
 | A-T4 | extends 自身/祖先/断链/循环；locked-branch 与严格 newer-QC；纯判断 | 包含于 **A2 10/10 通过** |
 | A-T5 | 合法/边界金额、无效账户/金额、连续 ID、失败不耗 ID、接收不执行 | **5/5 通过**；`test_role_a_submit.py` |
 | 合计 | 角色 A 三个定向测试文件 | **21/21 通过**；`results/role_a/role_a_all.txt` |
-| 公开独立用例 | admission、lock/one-vote、invalid transaction inputs | **3/3 通过**；framework 另 **3/3 通过** |
-| 完整公开集 | framework、Task A、Task B、integration | **6/17 通过，11 个错误均为 B/C TODO**；`public_after_role_a.txt` |
-| HTTP | 4 次投票后等待 A3；交易接入 | STEP 5 后 next=qc，A3 TODO 时 STEP 保持 5；Tx1 入池且余额仍 100/100/100；`http_role_a.txt`、`http_submit.json` |
+| 公开与基础集成 | public acceptance、A/B/C 定向测试 | **public 17/17；combined base 73/73**；`a6-a7-base-regression.txt` |
+| A7＋联合扩展 | 冲突提案、重复投票、非法注入、A6/B5、超时攻击与恢复历史 | **A7 7/7；extensions 14/14；总计 87/87**；`a6-a7-tests.txt` |
 
-公开测试是必要而非充分证据；完整 Task A/B 尚不能声明完成。
+公开测试是必要而非充分证据；当前工作副本的基础与已集成扩展测试共 87/87 通过。
 
 ## 4. 局限性与讨论（A 负责部分）
 
 - A1 的非空 payload 集成依赖 B2；完整 QC、三链提交和 view change 依赖 B 的 A3～A5；最终执行、回执和清池依赖 C。
-- 崩溃 leader 的提案侧仅调度 timeout；timeout/recover 未完成，不能声称 A6。A7、B6 均未实现。
+- A6 的 timeout/recover 已接入并通过与 A7 的交叉测试。A7 当前仅覆盖 equivocation 与 duplicate_vote；B6 尚未集成到本工作副本。
 - 系统在单进程中模拟四副本，以节点 ID 作为可信身份；不包含真实网络、门限签名或磁盘持久化。逻辑 step 不是分布式吞吐指标。
 
 ## AI 使用披露（须保留并与全组披露合并）
 
 - 2026-11-04：WorkBuddy AI 辅助 `HotStuffDemo.propose()` 的单函数实现/调试及 `test_role_a_propose.py`。
 - 2026-11-05：WorkBuddy AI 分别辅助 `Node.extends()`、`Node.can_vote()`、`HotStuffDemo.vote()` 的单函数实现/调试及 `test_role_a_voting.py`；辅助 `HotStuffDemo.submit()` 的单函数实现/调试及 `test_role_a_submit.py`。
+- 2026-11-20：WorkBuddy AI 辅助 A7 `HotStuffDemo.inject_attack()` 的单函数实现/调试及 `extensions_tests/test_role_a_attacks.py`（含 A6×A7 交叉测试）；未修改 A6 或 `vote()`。
 
-所有上述代码和测试文件均有 AI-assisted 标注，`changes.md` 同步登记。AI 未实现 B/C 负责函数、A7 或 B6，也未完成整个 Task A、Task B 或完整项目。成员 A 须逐行审查并能在报告/Q&A 中解释全部辅助函数。
+所有上述代码和测试文件均有 AI-assisted 标注，`changes.md` 同步登记。本次集成未实现 B6，也未替代成员完成答辩准备。成员 A 须逐行审查并能在报告/Q&A 中解释全部辅助函数。
 
 ## 个人贡献陈述（当前工作稿，最终提交前更新）
 
-本人负责 A1、A2、B1 及对应测试和报告。已完成 HighQC 选父与提案分发、本地谱系判断、安全投票规则、不同投票者记录、QC 唯一调度，以及交易严格校验、TxN 分配和入池。编写了 21 项定向测试并全部通过；相关公开独立用例、框架回归和 HTTP 路径均已验证。测试覆盖锁规则、每 view 一票、无效 QC、重复投票、严格金额类型、无效输入零副作用及接收不执行。完整 QC、提交、payload 和交易执行仍按小组接口等待联调，不将角色 A 模块完成表述为完整 Task A/B 完成。
+本人负责 A1、A2、B1 及对应测试和报告，并主责 A7。已完成提案、安全投票、交易接入，以及 equivocation 和 duplicate_vote 攻击注入。角色 A 基础定向测试 21 项、A7 与交叉场景测试 7 项均通过；A6、B5 集成后总回归 87/87。A7 复用正常投票、QC 和提交路径，未修改 A6 或共享 `vote()`，并通过超时后攻击和恢复后投票历史两项联合验证。
 
 ## 个人贡献证据（工作记录）
 
 - 成员：A（柳逸凡）；学号：［待填写］。
-- 代码：`backend/hotstuff.py` 的 `propose()`、`vote()`、`submit()`；`backend/node.py` 的 `extends()`、`can_vote()`。
-- 测试：`test_role_a_propose.py` 6 项、`test_role_a_voting.py` 10 项、`test_role_a_submit.py` 5 项。
-- 结果：`results/role_a/`；最终 commit 哈希待本人审查后提交，不虚构。
+- 代码：`backend/hotstuff.py` 的 `propose()`、`vote()`、`submit()`、`inject_attack()`；`backend/node.py` 的 `extends()`、`can_vote()`。
+- 测试：基础 21 项；A7 与 A6×A7 交叉测试 7 项。
+- 结果：`results/role_a/a6-a7-base-regression.txt`、`a6-a7-tests.txt`。

@@ -1,0 +1,19 @@
+test_limits (extensions_tests.test_batch.BatchExtensionTests.test_limits) ... ok
+test_reject_invalid (extensions_tests.test_batch.BatchExtensionTests.test_reject_invalid) ... ok
+test_crash_leader_timeout_and_recovery (extensions_tests.test_recovery.HotStuffTests.test_crash_leader_timeout_and_recovery) ... ok
+test_one_byzantine_replica_and_leader_rotation (extensions_tests.test_recovery.HotStuffTests.test_one_byzantine_replica_and_leader_rotation) ... ok
+test_orphaned_transaction_is_reproposed (extensions_tests.test_recovery.HotStuffTests.test_orphaned_transaction_is_reproposed) ... ok
+test_two_unavailable_voters_stall_without_false_qc (extensions_tests.test_recovery.HotStuffTests.test_two_unavailable_voters_stall_without_false_qc) ... ok
+test_view_gap_delays_commit_until_consecutive_chain (extensions_tests.test_recovery.HotStuffTests.test_view_gap_delays_commit_until_consecutive_chain) ... ok
+test_conflicting_branch_is_never_committed (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_conflicting_branch_is_never_committed) ... ok
+test_crashed_attacker_cannot_inject (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_crashed_attacker_cannot_inject) ... ok
+test_duplicate_vote_is_counted_once_with_one_qc (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_duplicate_vote_is_counted_once_with_one_qc) ... ok
+test_equivocation_after_timeout_uses_new_live_leader (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_equivocation_after_timeout_uses_new_live_leader) ... ok
+test_equivocation_is_rejected_by_normal_voting_path (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_equivocation_is_rejected_by_normal_voting_path) ... ok
+test_invalid_attack_requests_do_not_mutate_state (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_invalid_attack_requests_do_not_mutate_state) ... ok
+test_recovery_preserves_vote_history_after_duplicate_attack (extensions_tests.test_role_a_attacks.RoleAAttackTests.test_recovery_preserves_vote_history_after_duplicate_attack) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.067s
+
+OK

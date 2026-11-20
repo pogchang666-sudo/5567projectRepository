@@ -6,10 +6,10 @@ the full 100-point assessment. This distribution originally had no working
 consensus or transfer implementation. The dashboard and HTTP service start;
 calling an unimplemented operation returns a clear TODO message (HTTP 501).
 
-> **Integrated working tree (2026-11-15):** Role A, B and C work has been
-> merged. A1–A5 and B1–B4 are implemented, and the 73-test combined suite passes
-> (public acceptance 17/17). Optional A6/A7/B5/B6 remain TODO. See
-> [INTEGRATION.md](INTEGRATION.md) for sources, merge decisions and current evidence.
+> **A6/A7 integration (2026-11-20):** Based on `extension-b@f3b22d01`, this
+> working tree combines A6 recovery, B5 batch configuration and A7 equivocation /
+> duplicate-vote handling. All 73 base tests and 14 extension tests pass (87/87).
+> B6 remains outside this integration branch.
 
 ## Run
 
@@ -107,12 +107,12 @@ Run the relevant optional tests only when claiming the corresponding extension:
 ```bash
 python -m unittest discover -s extensions_tests -p 'test_recovery.py' -v
 python -m unittest discover -s extensions_tests -p 'test_batch.py' -v
+python -m unittest discover -s extensions_tests -p 'test_role_a_attacks.py' -v
 ```
 
-In this integrated working tree these optional tests still fail because A6
-(timeout/recovery) and B5 (batch configuration) are TODO; they are not part of
-the 73-test base suite. See
-[results/integration/optional-tests.txt](results/integration/optional-tests.txt).
+A6, B5 and A7 extension tests all pass in this integration branch, including
+attack-after-timeout and recovery-preserves-vote-history scenarios. Raw evidence:
+`results/role_a/a6-a7-base-regression.txt` and `a6-a7-tests.txt`.
 
 The five recovery/fault cases plus six integration cases preserve all eleven
 original regression tests. Add your own A7 and B6 tests for attack/tampering,
