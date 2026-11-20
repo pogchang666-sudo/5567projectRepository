@@ -3,7 +3,9 @@ from .models import Block, QC
 
 
 class Node:
-    def __init__(self, node_id: int, genesis: Block, genesis_qc: QC):
+    def __init__(self, node_id: int, genesis: Block, genesis_qc: QC,
+                 *, require_signatures: bool = False):
+        # AI-assisted B6 mode propagation; see changes.md.
         self.id = node_id
         self.view = 1
         self.role = "Leader" if node_id == 1 else "Replica"
@@ -11,7 +13,7 @@ class Node:
         self.locked_qc = genesis_qc
         self.blocks = {genesis.id: genesis}
         self.committed_blocks = [genesis.id]
-        self.machine = StateMachine()
+        self.machine = StateMachine(require_signatures=require_signatures)
         self.last_voted_view = 0
         self.crashed = False
         self.withhold_vote = False

@@ -515,6 +515,11 @@ form {
   margin-bottom:12px;
 }
 
+/* AI-assisted B6 signed-mode visibility; see changes.md. */
+#transfer-form[hidden] {
+  display:none;
+}
+
 form label {
   font-size:10px;
   color:var(--muted);

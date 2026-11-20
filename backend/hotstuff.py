@@ -10,6 +10,7 @@ from dataclasses import asdict
 from .blockchain import INITIAL_BALANCES
 from .models import Block, QC, Transaction
 from .node import Node
+from .transaction_security import transaction_id, verify_transaction
 
 
 class HotStuffDemo:
@@ -17,7 +18,9 @@ class HotStuffDemo:
     QUORUM = 3
     TIMEOUT_TICKS = 3
 
-    def __init__(self):
+    def __init__(self, *, require_signatures: bool = False):
+        # AI-assisted B6 mode propagation; see changes.md.
+        self.require_signatures = require_signatures
         self.reset()
 
     @property
@@ -30,10 +33,12 @@ class HotStuffDemo:
                           "view": self.view, "kind": kind, "message": message})
 
     def reset(self):
+        # AI-assisted B6 mode propagation; see changes.md.
         genesis = Block("B0", None, 0, 0)
         genesis_qc = QC("B0", 0, (1, 2, 3, 4))
         self.view = 1
-        self.nodes = [Node(i, genesis, genesis_qc) for i in range(1, 5)]
+        self.nodes = [Node(i, genesis, genesis_qc, require_signatures=self.require_signatures)
+                      for i in range(1, 5)]
         self.blocks = {genesis.id: genesis}
         self.qcs = {genesis.id: genesis_qc}
         self.transactions: dict[str, Transaction] = {}
@@ -49,11 +54,12 @@ class HotStuffDemo:
         self.phase = "Ready for proposal"
         self.log("Genesis B0 committed · Enter View 1 · Leader N1", "view")
 
-    def submit(self, sender: str, receiver: str, amount: int) -> Transaction:
+    def submit(self, sender: str, receiver: str, amount: int, *, nonce: int | None = None,
+               signature: str | None = None) -> Transaction:
         """B1 implement transaction admission and mempool insertion.
         Return a Transaction; validate account names and a strict integer amount
         in [1, 1000000]. Invalid requests must not modify state. Allocate Tx1,
-        Tx2, ... for the basic task. B6 may extend this interface for signed input.
+        Tx2, ... in basic mode, or verify and identify signed input in B6 mode.
         Do not execute transfers here."""
         # AI-assisted implementation; see changes.md.
         if not isinstance(sender, str) or not isinstance(receiver, str):
@@ -63,13 +69,39 @@ class HotStuffDemo:
         if type(amount) is not int or not 1 <= amount <= 1_000_000:
             raise ValueError("Amount must be an integer in [1, 1000000]")
 
-        tx_number = len(self.transactions) + 1
-        while f"Tx{tx_number}" in self.transactions:
-            tx_number += 1
-        tx = Transaction(f"Tx{tx_number}", sender, receiver, amount)
+        if self.require_signatures:
+            tx = self._admit_signed(sender, receiver, amount, nonce, signature)
+            if tx.id in self.transactions:
+                return tx
+        else:
+            if nonce is not None or signature is not None:
+                raise ValueError("Signed transaction mode is disabled")
+            tx_number = len(self.transactions) + 1
+            while f"Tx{tx_number}" in self.transactions:
+                tx_number += 1
+            tx = Transaction(f"Tx{tx_number}", sender, receiver, amount)
         self.transactions[tx.id] = tx
         self.mempool.append(tx.id)
         self.log(f"{tx.id} accepted: {sender} → {receiver} · {amount}", "transaction")
+        return tx
+
+    def _admit_signed(self, sender, receiver, amount, nonce, signature) -> Transaction:
+        # AI-assisted B6 admission and replay handling; see changes.md.
+        if nonce is None or signature is None:
+            raise ValueError("Signed transactions require both nonce and signature")
+        tx = Transaction(transaction_id(sender, receiver, amount, nonce),
+                         sender, receiver, amount, nonce, signature)
+        if not verify_transaction(tx):
+            raise ValueError("Invalid transaction signature")
+
+        existing = self.transactions.get(tx.id)
+        if existing is not None:
+            return existing
+        expected = self._receipt_source().machine.nonces[sender]
+        if nonce != expected:
+            raise ValueError(f"Expected nonce {expected} for {sender}")
+        if any(self.transactions[tx_id].sender == sender for tx_id in self.mempool):
+            raise ValueError(f"A transaction for {sender} with nonce {nonce} is already pending")
         return tx
 
     def step(self):
@@ -254,8 +286,13 @@ class HotStuffDemo:
         persistence is required. Clear simulated faults and rejoin safely."""
         raise NotImplementedError('TODO A6 restore crashed replicas from a trusted live peer.')
 
+    def _receipt_source(self):
+        # AI-assisted B6 reads the latest committed state; see changes.md.
+        return max(self.nodes, key=lambda n: (len(n.committed_blocks), not n.crashed))
+
     def snapshot(self):
-        source = max(self.nodes, key=lambda n: len(n.committed_blocks))
+        # AI-assisted B6 nonce display and consistency checks; see changes.md.
+        source = self._receipt_source()
         committed = set(source.committed_blocks)
         node_states = []
         for node in self.nodes:
@@ -267,6 +304,8 @@ class HotStuffDemo:
                 "committed_blocks": node.committed_blocks.copy(),
                 "accounts": node.machine.accounts.copy(),
             })
+            if self.require_signatures:
+                node_states[-1]["nonces"] = node.machine.nonces.copy()
         blocks = [{**asdict(block), "certificate": asdict(self.qcs[block.id]) if block.id in self.qcs else None,
                    "committed": block.id in committed,
                    "votes": sorted(self.votes.get(block.id, []))}
@@ -275,6 +314,8 @@ class HotStuffDemo:
                         for tx in self.transactions.values()]
         live = [n for n in self.nodes if not n.crashed]
         consistent = bool(live) and all(n.machine.accounts == live[0].machine.accounts
+                                       and n.machine.nonces == live[0].machine.nonces
+                                       and n.machine.receipts == live[0].machine.receipts
                                        and n.committed_blocks == live[0].committed_blocks for n in live)
         return {"view": self.view, "leader_id": self.leader_id, "running": self.running,
                 "steps": self.steps, "phase": self.phase, "nodes": node_states,
@@ -282,7 +323,8 @@ class HotStuffDemo:
                 "transactions": transactions, "accounts": source.machine.accounts.copy(),
                 "committed_chain": source.committed_blocks.copy(), "consistent": consistent,
                 "logs": list(self.logs), "quorum": self.QUORUM,
-                "next_event": self.events[0][0] if self.events else "propose"}
+                "next_event": self.events[0][0] if self.events else "propose",
+                "signature_required": self.require_signatures}
 
 
 

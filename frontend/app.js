@@ -43,11 +43,21 @@ async function mutate(path, body = {}) {
 
 function qcLabel(qc) { return `${qc.block_id} <small>v${qc.view}</small>`; }
 function txLine(tx) {
-  return `<span class="mono">${escapeHtml(tx.id)}</span><span>${escapeHtml(tx.sender)} → ${escapeHtml(tx.receiver)}</span><strong>${tx.amount}</strong>`;
+  // AI-assisted B6 signed transaction display; see changes.md.
+  const idLabel = tx.id.length > 16 ? `${tx.id.slice(0, 12)}…` : tx.id;
+  const nonce = tx.nonce == null ? '' : ` · nonce ${tx.nonce}`;
+  return `<span class="mono" title="${escapeHtml(tx.id)}">${escapeHtml(idLabel)}</span><span>${escapeHtml(tx.sender)} → ${escapeHtml(tx.receiver)}${nonce}</span><strong>${tx.amount}</strong>`;
 }
 
 function render(state) {
   currentState = state;
+  // AI-assisted B6 mode feedback; see changes.md.
+  $('transfer-form').hidden = Boolean(state.signature_required);
+  if (state.signature_required) {
+    const live = state.nodes.find(node => !node.crashed);
+    const nonces = Object.entries(live?.nonces || {}).map(([name, nonce]) => `${name} ${nonce}`);
+    $('tx-message').textContent = `Signed mode · Submit via the signing CLI · Next nonce: ${nonces.join(' · ')}`;
+  }
   $('view').textContent = String(state.view).padStart(2, '0');
   $('leader').textContent = `N${state.leader_id}`;
   $('running').textContent = `${state.running ? 'RUNNING' : 'PAUSED'} · STEP ${state.steps}`;
@@ -97,7 +107,7 @@ function renderBlock() {
 document.querySelectorAll('[data-action]').forEach(button => {
   button.addEventListener('click', async () => {
     const data = await mutate(`/api/control/${button.dataset.action}`);
-    if (data && button.dataset.action === 'reset') $('tx-message').textContent = 'Reset complete · All balances restored to 100';
+    if (data && button.dataset.action === 'reset' && !data.signature_required) $('tx-message').textContent = 'Reset complete · All balances restored to 100';
   });
 });
 $('byzantine').addEventListener('change', event => mutate('/api/byzantine', {node_id: event.target.value ? Number(event.target.value) : null}));

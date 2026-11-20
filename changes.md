@@ -33,8 +33,11 @@ insufficient-funds rejection; all four replicas stay consistent.
 
 ## Completed extensions
 
-None. A6 (timeout/recovery), A7 (malicious behavior), B5 (batch limit) and B6
-(signatures/nonce/replay) are not implemented. The optional recovery/batch
+B6 adds Ed25519 signatures at admission and execution, stable transaction IDs,
+per-account nonces and final receipt replay. See the signed-mode instructions
+in `README.md` and `extensions_tests/test_transaction_security.py`.
+A6 (timeout/recovery), A7 (malicious behavior), and B5 (batch limit) remain open.
+The optional recovery/batch
 tests currently report 1 pass, 1 failure and 5 errors; they are not part of the
 73-test base suite. See `results/integration/optional-tests.txt`.
 
@@ -45,8 +48,7 @@ passes. Remaining optional work:
 
 - A6: `HotStuffDemo.timeout()`、`HotStuffDemo.recover()`；
 - A7: `HotStuffDemo.inject_attack()` 与攻击路径校验；
-- B5: `HotStuffDemo.configure_batch()`；
-- B6: `sign_transaction()`、`verify_transaction()`、`transaction_id()`、nonce/重放处理。
+- B5: `HotStuffDemo.configure_batch()`。
 
 ## Integration note
 
@@ -66,5 +68,11 @@ directories are preserved unchanged for provenance. See `INTEGRATION.md`.
 角色 B 上传的 change log 未附 AI 使用声明；最终提交前需由 B 补充其实际使用情况。
 角色 A 的 AI 辅助代码与测试保留 `AI-assisted` 标记；角色 C 的 AI 辅助函数已在
 `StateMachine.apply()`、`Node.execute_committed()` 和 `finalize_transactions()`
-处标注。角色 A 的详细说明见 `role_a/REPORT_MATERIAL.md`。AI 未实现 A6/A7/B5/B6，
-也未替代成员完成答辩准备。
+处标注。角色 A 的详细说明见 `role_a/REPORT_MATERIAL.md`。
+
+- B6（2026-11-20）：本分支使用了 AI 生成和验证的扩展代码，涵盖
+  `backend/transaction_security.py` 的载荷、签名验证和 ID，
+  `HotStuffDemo.submit()`、`_admit_signed()`、`_receipt_source()` 和
+  `snapshot()` 的接收、回执和状态展示，
+  `StateMachine.apply()` 的再次验签和 nonce，
+  请求/交易模型、初始化、API、界面、签名客户端及 B6 测试。

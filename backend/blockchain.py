@@ -1,12 +1,16 @@
 from .models import Transaction
+from .transaction_security import verify_transaction
 
 
 INITIAL_BALANCES = {"Alice": 100, "Bob": 100, "Charlie": 100}
 
 
 class StateMachine:
-    def __init__(self):
+    def __init__(self, *, require_signatures: bool = False):
+        # AI-assisted B6 state; see changes.md.
         self.accounts = INITIAL_BALANCES.copy()
+        self.require_signatures = require_signatures
+        self.nonces = dict.fromkeys(self.accounts, 0)
         # Receipts also make execution idempotent across catch-up and retries.
         self.receipts: dict[str, dict] = {}
 
@@ -17,10 +21,23 @@ class StateMachine:
         funds. A failed transfer changes no balance. Return/store a receipt with
         status committed or rejected and error None or an explanatory string.
         Reusing a transaction ID returns its prior receipt without another debit.
-        B6 extends this with signature verification, nonces and stable identities."""
+        In signed mode, check authenticity before consulting cached receipts.
+        Only a verified transaction with the next nonce consumes that nonce."""
         # AI-assisted implementation; see changes.md.
+        if self.require_signatures:
+            if not verify_transaction(tx):
+                return {"status": "rejected", "error": "Invalid signature or signed transaction"}
+        elif tx.signature is not None or tx.nonce is not None:
+            return {"status": "rejected", "error": "Signed transaction mode is disabled"}
+
         if tx.id in self.receipts:
             return self.receipts[tx.id]
+
+        if self.require_signatures:
+            if tx.nonce != self.nonces[tx.sender]:
+                return {"status": "rejected", "error": "Unexpected nonce"}
+            # An authenticated execution uses its nonce even when funds are insufficient.
+            self.nonces[tx.sender] += 1
 
         error = None
         if tx.sender not in self.accounts or tx.receiver not in self.accounts:

@@ -8,7 +8,8 @@ calling an unimplemented operation returns a clear TODO message (HTTP 501).
 
 > **Integrated working tree (2026-11-15):** Role A, B and C work has been
 > merged. A1–A5 and B1–B4 are implemented, and the 73-test combined suite passes
-> (public acceptance 17/17). Optional A6/A7/B5/B6 remain TODO. See
+> (public acceptance 17/17). B6 signed transactions are available in a dedicated
+> mode. Optional A6/A7/B5 remain TODO. See
 > [INTEGRATION.md](INTEGRATION.md) for sources, merge decisions and current evidence.
 
 ## Run
@@ -24,6 +25,48 @@ Open http://localhost:8000. Start runs one logical event every 0.8 seconds;
 Next Step runs one event. A missing event pauses and remains available for
 retry. Reset restores genesis, three balances of 100, and batch limit 5.
 No reference solution is loaded or available through a mode switch.
+
+## Run B6 signed transactions
+
+From PowerShell, start the server in signed mode and open
+[the dashboard](http://127.0.0.1:8000):
+
+```powershell
+$env:HOTSTUFF_SIGNED_TRANSACTIONS = '1'
+python -m backend.main
+```
+
+In a second terminal at the repository root, submit a signed transfer with the
+classroom client:
+
+```powershell
+python -m tools.signed_transfer Alice Bob 80 0
+```
+
+Run the same command before and after advancing the dashboard to commitment.
+Before commitment both requests return the same ID and a null receipt. After
+commitment the same command returns the final receipt. Alice's next nonce is 1.
+Submit `python -m tools.signed_transfer Alice Charlie 80 1` and advance to
+commitment again to demonstrate a rejected transfer that still consumes nonce 1.
+The dashboard shows next nonces, balances and receipts. To restore the basic
+unsigned demo, stop the server, remove the environment variable
+(`Remove-Item Env:HOTSTUFF_SIGNED_TRANSACTIONS`), and restart.
+
+B6 verifies Ed25519 signatures at admission and execution. The canonical bytes
+are ASCII JSON with sorted keys and no separator whitespace. They contain
+`domain` (`COMP5567/HotStuff/Classroom/v1`), `sender`, `receiver`, `amount` and
+`nonce`. The transaction ID is the SHA-256 hex digest of those bytes. The HTTP
+request carries the same transaction fields plus the hex signature. The server
+accepts only the next committed nonce and at most one pending transfer per sender.
+An identical signed request returns the existing ID and receipt, while a different
+payload with a pending nonce or a request with a future nonce is rejected. Invalid
+signatures and wrong nonces leave the balances and nonces unchanged. An authenticated
+insufficient-funds result receives a final receipt and consumes its nonce once.
+
+The client uses publicly reproducible classroom keys. Signed mode demonstrates
+the protocol checks with those keys and in-memory state. Reset starts a new
+simulation with all nonces at zero. Cross-restart replay protection would require
+persistent state or a fresh signed domain. A6 recovery is separate from B6.
 
 ## Task map
 
@@ -69,15 +112,14 @@ You may add helpers. Do not change quorum three or bypass commitment.
   Implement attack injection and recipient-aware delivery as needed. Demonstrate
   conflicting proposals plus duplicate_vote or invalid_qc. Other nodes' identity
   cannot be impersonated under the simulator's trusted identity model.
-* B6: add sign_transaction(), verify_transaction() and transaction_id() in a
-  module of your choice. Extend Transaction and the request model to carry
-  nonce/signature, add a signing client, and follow the specification. Ordinary
-  signatures are sufficient; do not implement cryptographic primitives yourself.
+* B6 uses the signing helpers in `backend/transaction_security.py` and the
+  classroom client in `tools/signed_transfer.py`. It does not alter the quorum
+  or the consensus commit rule.
 
 The queue, API validation, fault switches, initial state, snapshot generation,
 frontend and dispatch_qc are supplied infrastructure, not completed task credit.
-The dashboard agreement badge compares live balances and committed chains only;
-your tests must also inspect receipts and (for B6) nonces.
+The dashboard agreement badge compares the live replicas' balances, committed
+chains, receipts and nonces.
 
 ## Tests
 
@@ -107,6 +149,7 @@ Run the relevant optional tests only when claiming the corresponding extension:
 ```bash
 python -m unittest discover -s extensions_tests -p 'test_recovery.py' -v
 python -m unittest discover -s extensions_tests -p 'test_batch.py' -v
+python -m unittest extensions_tests.test_transaction_security -v
 ```
 
 In this integrated working tree these optional tests still fail because A6
@@ -115,8 +158,10 @@ the 73-test base suite. See
 [results/integration/optional-tests.txt](results/integration/optional-tests.txt).
 
 The five recovery/fault cases plus six integration cases preserve all eleven
-original regression tests. Add your own A7 and B6 tests for attack/tampering,
-wrong account, replay before/after commit, nonce progression and recovery.
+original regression tests. The B6 suite checks tampering, wrong-account
+signatures, replay, nonce validation and receipts across four replicas. See the
+[B6 verification log](results/extension_b6/verification.txt) for the test output
+and the signed HTTP and CLI run.
 Passing public tests is necessary evidence, not a complete grading rubric.
 
 ## Submission and demonstration

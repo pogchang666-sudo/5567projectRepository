@@ -3,10 +3,13 @@ from dataclasses import dataclass, field
 
 @dataclass(frozen=True)
 class Transaction:
+    # AI-assisted B6 fields; see changes.md.
     id: str
     sender: str
     receiver: str
     amount: int
+    nonce: int | None = None
+    signature: str | None = None
 
 
 @dataclass(frozen=True)

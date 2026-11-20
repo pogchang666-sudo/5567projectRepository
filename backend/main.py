@@ -1,6 +1,7 @@
 """Run from the project root with: python backend/main.py"""
 import asyncio
 from contextlib import asynccontextmanager, suppress
+import os
 from pathlib import Path
 import sys
 
@@ -14,9 +15,11 @@ from pydantic import BaseModel, ConfigDict, Field
 import uvicorn
 
 from backend.hotstuff import HotStuffDemo
+from backend.transaction_security import MAX_NONCE
 
 
-demo = HotStuffDemo()
+# AI-assisted B6 mode configuration; see changes.md.
+demo = HotStuffDemo(require_signatures=os.environ.get("HOTSTUFF_SIGNED_TRANSACTIONS") == "1")
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
 
 
@@ -50,10 +53,13 @@ app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
 
 
 class TransferRequest(BaseModel):
+    # AI-assisted B6 request fields; see changes.md.
     model_config = ConfigDict(extra="forbid")
     sender: str
     receiver: str
     amount: int = Field(strict=True, ge=1, le=1_000_000)
+    nonce: int | None = Field(default=None, strict=True, ge=0, le=MAX_NONCE)
+    signature: str | None = Field(default=None, min_length=128, max_length=128)
 
 
 class ByzantineRequest(BaseModel):
@@ -93,11 +99,19 @@ async def control(action: str):
 
 @app.post("/api/transactions")
 async def submit_transaction(request: TransferRequest):
+    # AI-assisted B6 replay response; see changes.md.
     try:
-        tx = demo.submit(request.sender, request.receiver, request.amount)
+        tx = demo.submit(request.sender, request.receiver, request.amount,
+                         nonce=request.nonce, signature=request.signature)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
-    return {"transaction_id": tx.id, "state": demo.snapshot()}
+    snapshot = demo.snapshot()
+    response = {"transaction_id": tx.id, "state": snapshot}
+    if demo.require_signatures:
+        entry = next(item for item in snapshot["transactions"] if item["id"] == tx.id)
+        response["receipt"] = (None if entry["status"] == "pending"
+                               else {"status": entry["status"], "error": entry["error"]})
+    return response
 
 
 @app.post("/api/byzantine")
