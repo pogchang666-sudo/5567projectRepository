@@ -40,6 +40,8 @@ class HotStuffDemo:
         self.mempool: list[str] = []
         self.votes: dict[str, set[int]] = {}
         self.qc_scheduled: set[str] = set()
+        self.timeout_armed: set[str] = set()
+        self.vote_attempts: dict[str, set[int]] = {}
         self.events = deque([("propose", None)])
         self.logs = deque(maxlen=400)
         self.log_sequence = 0
@@ -149,11 +151,15 @@ class HotStuffDemo:
         local_block = node.blocks.get(block_id)
         if not isinstance(block, Block) or not isinstance(local_block, Block):
             return False
+        self.vote_attempts.setdefault(block_id, set()).add(node_id)
         if local_block != block:
             return False
         if block.proposer != self.leader_id or block.view != self.view:
             return False
         if not isinstance(block.parent_id, str):
+            return False
+        if self.nodes[block.proposer - 1].crashed:
+            self._arm_if_stalled(block_id, f"{block_id} proposer crashed")
             return False
 
         parent = self.blocks.get(block.parent_id)
@@ -188,6 +194,8 @@ class HotStuffDemo:
             self.qc_scheduled.add(block_id)
             self.events.append(("qc", block_id))
             self.log(f"Quorum reached for {block_id}", "qc")
+        elif len(voters) < self.QUORUM:
+            self._arm_if_stalled(block_id, f"{block_id} cannot reach quorum")
         return True
 
     def form_qc(self, block_id):
@@ -214,11 +222,35 @@ class HotStuffDemo:
         self.events.append(("next_view", "QC"))
         return qc
 
+    def _arm_if_stalled(self, block_id: str, reason: str):
+        """Arm one pacemaker countdown once every live voter has been heard."""
+        eligible = {node.id for node in self.nodes
+                    if not node.crashed and not node.withhold_vote}
+        if eligible and eligible <= self.vote_attempts.get(block_id, set()):
+            self.log(f"{reason} · arm timeout", "fault")
+            self._arm_timeout(block_id)
+
+    def _arm_timeout(self, block_id: str):
+        """Start one pacemaker countdown per stalled round."""
+        if block_id in self.timeout_armed or block_id in self.qc_scheduled:
+            return
+        self.timeout_armed.add(block_id)
+        self.events.append(("timeout", self.TIMEOUT_TICKS))
+
     def timeout(self, remaining):
         """A6 implement logical timeout countdown and leader replacement.
         remaining is the number of logical ticks left. Eventually schedule
         ("next_view", "timeout") while preserving the quorum and safety state."""
-        raise NotImplementedError('TODO A6 implement logical timeout countdown and leader replacement.')
+        if type(remaining) is not int or remaining < 0:
+            remaining = self.TIMEOUT_TICKS
+        if remaining > 0:
+            self.phase = f"Leader timeout · {remaining} ticks left"
+            self.log(f"Timeout tick · {remaining} left", "fault")
+            self.events.append(("timeout", remaining - 1))
+        else:
+            self.phase = "Timeout expired · rotating leader"
+            self.log("Timeout expired · rotate leader", "fault")
+            self.events.append(("next_view", "timeout"))
 
     def next_view(self, reason):
         """A5 implement view increment, leader rotation and replica updates.
@@ -252,7 +284,35 @@ class HotStuffDemo:
         Restore balances and receipts, and B6 nonces if implemented. If no live
         peer is available, reject recovery without inventing state. No disk
         persistence is required. Clear simulated faults and rejoin safely."""
-        raise NotImplementedError('TODO A6 restore crashed replicas from a trusted live peer.')
+        live = [node for node in self.nodes if not node.crashed]
+        if not live:
+            self.phase = "Recovery rejected · no live replica"
+            self.log("Recovery rejected · no live replica", "fault")
+            return False
+
+        source = max(live, key=lambda node: len(node.committed_blocks))
+        recovered = []
+        for node in self.nodes:
+            if not node.crashed:
+                continue
+            node.blocks = {block_id: deepcopy(block)
+                           for block_id, block in source.blocks.items()}
+            node.committed_blocks = list(source.committed_blocks)
+            node.machine.accounts = dict(source.machine.accounts)
+            node.machine.receipts = deepcopy(source.machine.receipts)
+            node.high_qc = deepcopy(source.high_qc)
+            node.locked_qc = deepcopy(source.locked_qc)
+            node.view = self.view
+            node.role = "Leader" if node.id == self.leader_id else "Replica"
+            node.last_voted_view = max(node.last_voted_view, source.last_voted_view)
+            node.crashed = False
+            node.withhold_vote = False
+            recovered.append(node.id)
+
+        if recovered:
+            self.phase = "Recovered " + ", ".join(f"N{i}" for i in recovered)
+            self.log(f"{self.phase} from N{source.id}", "fault")
+        return bool(recovered)
 
     def snapshot(self):
         source = max(self.nodes, key=lambda n: len(n.committed_blocks))
